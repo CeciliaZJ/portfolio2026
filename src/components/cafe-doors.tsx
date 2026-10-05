@@ -1,24 +1,52 @@
 "use client";
 
+import Image from "next/image";
+import Script from "next/script";
 import { useEffect, useRef } from "react";
+
+const doorScrollScript = `
+(function () {
+  var rig = document.querySelector(".door-rig");
+  if (!rig || rig.dataset.bound === "1") return;
+  rig.dataset.bound = "1";
+  var media = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var frame = 0;
+  function apply() {
+    if (media.matches) {
+      rig.style.setProperty("--open", "0");
+      return;
+    }
+    var hero = document.getElementById("top");
+    var start = hero ? hero.offsetTop : 0;
+    var distance = 520;
+    var progress = Math.min(1, Math.max(0, (window.scrollY - start) / distance));
+    var eased = progress;
+    rig.style.setProperty("--open", eased.toFixed(4));
+  }
+  function onScroll() {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(apply);
+  }
+  apply();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  media.addEventListener("change", apply);
+})();
+`;
 
 function Door({ side }: { side: "left" | "right" }) {
   return (
-    <div className={side === "left" ? "door door-left relative h-full min-w-0 flex-1" : "door door-right relative h-full min-w-0 flex-1"}>
+    <div
+      className={
+        side === "left"
+          ? "door door-left relative h-full min-w-0 flex-1"
+          : "door door-right relative h-full min-w-0 flex-1"
+      }
+    >
       <div className="door-panel absolute inset-0 flex flex-col gap-2 p-2">
-        <div className="grid flex-1 grid-cols-2 grid-rows-3 gap-1.5">
-          {Array.from({ length: 6 }, (_, index) => (
-            <div key={index} className="glass-pane rounded-[2px]" />
-          ))}
-        </div>
-        <div className="h-3 rounded-sm bg-wood-deep/80" />
-        <div
-          className={
-            side === "left"
-              ? "absolute top-[46%] right-2 h-2 w-8 rounded-full bg-brass shadow-sm"
-              : "absolute top-[46%] left-2 h-2 w-8 rounded-full bg-brass shadow-sm"
-          }
-        />
+        <div className="flex-[2.2] rounded-[2px] border-2 border-[#4a2c1c] bg-[#a56b43]" />
+        <div className="h-2 shrink-0 rounded-sm bg-[#4a2c1c]" />
+        <div className="flex-1 rounded-[2px] border-2 border-[#4a2c1c] bg-[#a56b43]" />
       </div>
     </div>
   );
@@ -40,9 +68,11 @@ export function CafeDoors() {
         return;
       }
 
-      const range = Math.min(240, Math.max(160, window.innerHeight * 0.28));
-      const progress = Math.min(1, Math.max(0, window.scrollY / range));
-      const eased = 1 - (1 - progress) ** 2.2;
+      const hero = document.getElementById("top");
+      const start = hero?.offsetTop ?? 0;
+      const distance = 520;
+      const progress = Math.min(1, Math.max(0, (window.scrollY - start) / distance));
+      const eased = progress;
       rig.style.setProperty("--open", eased.toFixed(4));
     };
 
@@ -65,24 +95,26 @@ export function CafeDoors() {
   }, []);
 
   return (
-    <div ref={rigRef} className="door-rig mx-auto w-[210px] sm:w-[240px]" aria-hidden="true">
-      <div className="rounded-sm bg-wood-deep p-2 shadow-card">
-        <div className="doorway relative h-[280px] sm:h-[320px]">
-          <div className="absolute inset-0 overflow-hidden bg-gradient-to-b from-[#f8d7a4] via-[#e7a15a] to-[#b5653a]">
-            <div className="mx-auto mt-5 h-4 w-4 rounded-full bg-[#fff1c9] shadow-[0_0_24px_12px_rgba(255,214,120,0.85)]" />
-            <div className="mx-auto h-8 w-px bg-[#5c3a26]/50" />
-            <p className="mt-6 text-center font-script text-4xl text-awning-dark">open</p>
-            <div className="absolute inset-x-0 bottom-0 h-16 bg-[#6a412b]">
-              <div className="mx-auto mt-3 h-8 w-24 rounded-t-md bg-[#8d5e40]" />
-            </div>
-          </div>
-          <div className="absolute inset-0 flex gap-1">
-            <Door side="left" />
-            <Door side="right" />
-          </div>
+    <div ref={rigRef} className="door-rig h-96 w-full max-w-sm lg:h-3/4 lg:max-w-none" aria-hidden="true">
+      <Script id="cafe-door-scroll" strategy="afterInteractive">
+        {doorScrollScript}
+      </Script>
+      <div className="relative h-full bg-[#4a2c1c] p-1.5 shadow-card">
+        <div className="absolute inset-1.5 overflow-hidden">
+          <Image
+            src="/cafe-interior.jpg"
+            alt=""
+            fill
+            sizes="320px"
+            className="cafe-blur object-cover"
+          />
+        </div>
+        <div className="doorway absolute inset-1.5 flex">
+          <Door side="left" />
+          <Door side="right" />
         </div>
       </div>
-      <p className="door-hint mt-3 text-center font-pixel text-[8px] tracking-wide text-ink">
+      <p className="door-hint mt-2 text-center font-pixel text-[8px] tracking-wide text-ink">
         scroll to open
       </p>
     </div>
