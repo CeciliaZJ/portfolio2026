@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #ffedd9;
+  --color-wall: #fff6ee;
+  --color-awning-dark: #7b3437;
+  --color-awning: #ad4242;
+  --color-awning-light: #d35959;
+  --color-ink: #b44752;
+  --color-ink-deep: #92242f;
+  --color-gingham: #e15a5a;
+  --color-trim: #809d4b;
+  --color-folio: #95b758;
+  --color-title: #fbff93;
+  --color-paper: #f2f2f2;
+  --color-cart: #e5e5e5;
+  --color-link: #2f6fd0;
+  --color-receipt: #1a16b8;
+  --color-wood: #8d5e40;
+  --color-wood-deep: #5c3a26;
+  --color-wood-light: #d7b48f;
+  --color-glass: #d5e4ea;
+  --color-brass: #e0b85a;
+  --color-basket: #ef3a2f;
+  --color-basket-deep: #c81e18;
+
+  --shadow-card: 0 10px 28px rgba(90, 36, 36, 0.1);
+  --shadow-receipt: 0 18px 40px rgba(40, 30, 30, 0.18);
+}
+
+@theme inline {
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: var(--font-silkscreen), ui-monospace, monospace;
+  --font-script: var(--font-caveat), cursive;
+  --font-display: var(--font-fredoka), ui-sans-serif, sans-serif;
+  --font-receipt: var(--font-special-elite), ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-wall);
+  color: #1c1c1c;
+}
+
+::selection {
+  background: var(--color-title);
+  color: var(--color-awning-dark);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-title);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+.gingham {
+  background-color: #fff;
+  background-image:
+    linear-gradient(90deg, var(--color-gingham) 50%, transparent 50%),
+    linear-gradient(var(--color-gingham) 50%, transparent 50%);
+  background-size: 16px 16px;
+}
+
+.door-rig {
+  --open: 0;
+}
+
+.doorway {
+  perspective: 1200px;
+}
+
+.door {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.door-left {
+  transform-origin: left center;
+  transform: rotateY(calc(var(--open) * -78deg));
+}
+
+.door-right {
+  transform-origin: right center;
+  transform: rotateY(calc(var(--open) * 78deg));
+}
+
+.door-panel {
+  backface-visibility: hidden;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(40, 18, 8, 0.28),
+      transparent 16%,
+      transparent 84%,
+      rgba(40, 18, 8, 0.28)
+    ),
+    linear-gradient(180deg, var(--color-wood-light), var(--color-wood) 42%, #6d452c);
+  box-shadow:
+    inset 0 0 0 3px var(--color-wood-deep),
+    4px 8px 16px rgba(50, 24, 12, 0.22);
+}
+
+.glass-pane {
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.82) 0%,
+      rgba(255, 255, 255, 0.18) 36%,
+      rgba(150, 186, 198, 0.45) 100%
+    ),
+    var(--color-glass);
+  box-shadow: inset 0 0 0 1px rgba(60, 36, 24, 0.45);
+}
+
+.door-hint {
+  opacity: calc(1 - var(--open));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .door-left,
+  .door-right,
+  .door-hint {
+    transition: none;
+  }
+}
